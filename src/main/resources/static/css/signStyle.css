@@ -1,0 +1,19 @@
+body{
+background-image : url("/img/background.jpg");
+background-repeat : no-repeat;
+background-size : cover;
+}
+.signUpBox{
+width: 640px;
+min-height : 800px;
+}
+.signInBox{
+width: 620px;
+height: 550px;
+}
+.blankBox{
+width: 150px;
+}
+.signUpBlank{
+height: 80px;
+}

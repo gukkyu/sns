@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{layout/signLayout}">
+<th:block layout:fragment="content">
+    <section class="contents d-flex justify-content-center">
+        <div class="signUpBox mt-3 bg-white d-flex justify-content-center">
+            <div class="w-50">
+                <div class="signUpBlank"></div>
+                <div class="display-4 mb-3 d-flex justify-content-center">Instantgram</div>
+                <div class="text-primary mb-5 d-flex justify-content-center">Sign up</div>
+                <form method="post" action="/user/sign-up" id="signUpForm">
+                    <div class="form-group">
+                        <div class="d-flex align-items-center justify-content-between mb-1">
+                            <div class="small font-weight-bold mr-3">ID</div>
+                            <div id="idCheckLength" class="small text-danger d-none">ID를 4자 이상 입력해주세요.</div>
+                            <div id="idCheckDuplicated" class="small text-danger d-none">이미 사용중인 ID입니다.</div>
+                        </div>
+                        <input name="id" type="text" class="form-control" placeholder="ID를 입력하세요.">
+                    </div>
+
+                    <div class="form-group">
+                        <div class="d-flex align-items-center justify-content-between mb-1">
+                            <div class="small font-weight-bold mr-3">비밀번호</div>
+                            <div id="passwordError" class="small text-danger d-none mt-1">비밀번호를 확인해주세요.</div>
+                            <div id="passwordLength" class="small text-danger d-none mt-1">비밀번호를 입력해주세요.</div>
+                        </div>
+                        <input name="password" type="password" class="form-control" placeholder="비밀번호를 입력해주세요.">
+                    </div>
+
+                    <div class="form-group">
+                        <input name="passwordCheck" type="password" class="form-control" placeholder="비밀번호 확인">
+                    </div>
+
+                    <div class="form-group">
+                        <div class="d-flex align-items-center justify-content-between mb-1">
+                            <div class="small font-weight-bold mr-3">이름</div>
+                            <span id="nameCheck" class="small text-danger d-none">이름을 입력해주세요.</span>
+                        </div>
+                        <input name="name" type="text" class="form-control" placeholder="이름을 입력해주세요.">
+                    </div>
+
+                    <div class="form-group">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="small font-weight-bold mb-1 mr-3">이메일</div>
+                            <span id="emailCheck" class="small text-danger d-none mb-1">이메일을 입력해주세요.</span>
+                            <span id="emailFormCheck" class="small text-danger d-none mb-1">이메일 양식을 확인해주세요.</span>
+                        </div>
+                        <input name="email" type="text" class="form-control" placeholder="이메일을 입력해주세요.">
+                    </div>
+
+                    <button type="submit" class="submitBtn mt-5 btn btn-primary w-100">회원가입</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        $(function(){
+            $(".submitBtn").on("click", function(){
+                // alert("submit");
+                event.preventDefault();
+
+                $("#idCheckLength").addClass("d-none");
+                $("#idCheckDuplicated").addClass("d-none");
+                $("#passwordError").addClass("d-none");
+                $("#passwordLength").addClass("d-none");
+                $("#nameCheck").addClass("d-none");
+                $("#emailCheck").addClass("d-none");
+                $("#emailFormCheck").addClass("d-none");
+
+                let loginId = $("input[name=id]").val().trim();
+                let password = $("input[name=password]").val().trim();
+                let passwordCheck = $("input[name=passwordCheck]").val().trim();
+                let name = $("input[name=name]").val().trim();
+                let email = $("input[name=email]").val().trim();
+
+                let isError = false;
+
+                if(loginId.length < 4){
+                    $("#idCheckLength").removeClass("d-none");
+                    isError = true;
+                }
+
+                if(password.length < 4 || password.length == 0){
+                    $("#passwordLength").removeClass("d-none");
+                    isError = true;
+                }
+
+                if(password !== passwordCheck){
+                    $("#passwordError").removeClass("d-none");
+                    isError = true;
+                }
+
+                if(name.length < 3){
+                    $("#nameCheck").removeClass("d-none");
+                    isError = true;
+                }
+
+                if(email.length < 4){
+                    $("#emailCheck").removeClass("d-none");
+                    isError = true;
+                }
+
+                if(email.length >= 4 && (!email.includes("@") || !email.endsWith(".com"))){
+                    $("#emailFormCheck").removeClass("d-none");
+                    isError = true;
+                }
+
+                if(isError){
+                    return;
+                }
+
+                $.ajax({
+                    url:"/user/is-duplicate-id",
+                    data:{"loginId":loginId},
+
+                    success:function(data){
+                        if(data.code == 200){
+                            if(data.is_duplicate_id){
+                                $("#idCheckDuplicated").removeClass("d-none");
+                            } else{
+                                $("#signUpForm").submit();
+                            }
+                        } else{
+                            alert(data.error_message);
+                        }
+                    },
+                    error:function(e){
+                        alert("회원가입 실패!");
+                    }
+                });
+            });
+        });
+    </script>
+</th:block>

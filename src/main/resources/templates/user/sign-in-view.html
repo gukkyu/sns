@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{layout/signLayout}">
+<th:block layout:fragment="content">
+    <section class="contents d-flex justify-content-end align-items-center" style="height:1080px;">
+        <div class="signInBox bg-white d-flex justify-content-center align-items-center">
+            <div class="w-50">
+                <div class="display-4 mb-3 d-flex justify-content-center">Instantgram</div>
+                <div class="text-primary mb-4 d-flex justify-content-center">Sign in</div>
+                <form method="post" action="/user/sign-in" id="signInForm">
+                    <input name="id" type="text" class="form-control" placeholder="ID">
+                    <input name="password" type="password" class="form-control mt-3" placeholder="password">
+                    <button type="submit" id="loginBtn" class="btn btn-success form-control mt-4">Login</button>
+                </form>
+                <div class="mt-4 d-flex justify-content-between">
+                    <span>Don't you have account?</span>
+                    <a href="/user/sign-up-view">Sign up</a>
+                </div>
+            </div>
+        </div>
+        <div class="blankBox"></div>
+    </section>
+
+    <script>
+        $(function(){
+            $("#loginBtn").on("click", function(){
+                let loginId = $("input[name=id]").val().trim();
+                let password = $("input[name=password]").val().trim();
+                event.preventDefault();
+            });
+        });
+    </script>
+</th:block>

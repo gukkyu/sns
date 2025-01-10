@@ -10,8 +10,12 @@ public class UserController {
 
     @GetMapping("/sign-up-view")
     public String signUpView(){
-        return "";
+        return "user/sign-up-view";
     }
 
+    @GetMapping("/sign-in-view")
+    public String signInView(){
+        return "user/sign-in-view";
+    }
 
 }
