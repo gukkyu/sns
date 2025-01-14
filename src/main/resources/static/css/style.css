@@ -1,6 +1,11 @@
-html, body{
+html, body, #wrap{
 min-height: 100%;
 }
 .black{
 color: black;
 }
+
+.menu{position:fixed}
+header{width:6%;}
+.profile{width:15%;}
+.timeline{width:79%;}
