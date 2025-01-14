@@ -5,7 +5,7 @@
         layout:decorate="~{layout/signLayout}">
 <th:block layout:fragment="content">
     <section class="contents d-flex justify-content-center">
-        <div class="signUpBox mt-3 bg-white d-flex justify-content-center">
+        <div class="signUpBox my-3 bg-white d-flex justify-content-center">
             <div class="w-50">
                 <div class="signUpBlank"></div>
                 <div class="display-4 mb-3 d-flex justify-content-center">Instantgram</div>
@@ -16,8 +16,12 @@
                             <div class="small font-weight-bold mr-3">ID</div>
                             <div id="idCheckLength" class="small text-danger d-none">ID를 4자 이상 입력해주세요.</div>
                             <div id="idCheckDuplicated" class="small text-danger d-none">이미 사용중인 ID입니다.</div>
+                            <div id="idCheckOk" class="small text-success d-none">사용 가능한 ID 입니다.</div>
                         </div>
-                        <input name="id" type="text" class="form-control" placeholder="ID를 입력하세요.">
+                        <div class="d-flex">
+                            <input name="id" type="text" class="form-control" placeholder="ID를 입력하세요.">
+                            <button type="button" id="idCheck" class="form-control col-4 btn btn-success">중복확인</button>
+                        </div>
                     </div>
 
                     <div class="form-group">
@@ -58,12 +62,41 @@
 
     <script>
         $(function(){
-            $(".submitBtn").on("click", function(){
-                // alert("submit");
-                event.preventDefault();
-
+            $("#idCheck").on("click", function(){
                 $("#idCheckLength").addClass("d-none");
                 $("#idCheckDuplicated").addClass("d-none");
+                $("#idCheckOk").addClass("d-none");
+
+                let loginId = $("input[name=id]").val().trim();
+
+                if (loginId.length < 4) {
+                    $("#idCheckLength").removeClass("d-none");
+                    return;
+                }
+
+                $.ajax({
+                    url:"/user/is-duplicate-id",
+                    data:{"loginId":loginId},
+
+                    success:function(data){
+                        if(data.code == 200){
+                            if(data.is_duplicate_id){
+                                $("#idCheckDuplicated").removeClass("d-none");
+                            } else{
+                                $("#idCheckOk").removeClass("d-none");
+                            }
+                        } else{
+                            alert(data.error_message);
+                        }
+                    },
+                    error:function(e){
+                        alert("중복확인 실패!");
+                    }
+                });
+            });
+            $("#signUpForm").on("submit", function(e){
+                e.preventDefault();
+
                 $("#passwordError").addClass("d-none");
                 $("#passwordLength").addClass("d-none");
                 $("#nameCheck").addClass("d-none");
@@ -78,57 +111,45 @@
 
                 let isError = false;
 
-                if(loginId.length < 4){
-                    $("#idCheckLength").removeClass("d-none");
-                    isError = true;
-                }
-
-                if(password.length < 4 || password.length == 0){
+                if (!password) {
                     $("#passwordLength").removeClass("d-none");
                     isError = true;
                 }
 
-                if(password !== passwordCheck){
+                if (password !== passwordCheck) {
                     $("#passwordError").removeClass("d-none");
                     isError = true;
                 }
 
-                if(name.length < 3){
+                if (!name) {
                     $("#nameCheck").removeClass("d-none");
                     isError = true;
                 }
 
-                if(email.length < 4){
+                if (!email) {
                     $("#emailCheck").removeClass("d-none");
                     isError = true;
                 }
 
-                if(email.length >= 4 && (!email.includes("@") || !email.endsWith(".com"))){
+                if (email.length >= 4 && (!email.includes("@") || !email.includes("."))) {
                     $("#emailFormCheck").removeClass("d-none");
                     isError = true;
                 }
 
-                if(isError){
-                    return;
+                if (isError) {
+                    return false;
                 }
 
-                $.ajax({
-                    url:"/user/is-duplicate-id",
-                    data:{"loginId":loginId},
+                let url = $(this).attr("action");
 
-                    success:function(data){
-                        if(data.code == 200){
-                            if(data.is_duplicate_id){
-                                $("#idCheckDuplicated").removeClass("d-none");
-                            } else{
-                                $("#signUpForm").submit();
-                            }
-                        } else{
-                            alert(data.error_message);
-                        }
-                    },
-                    error:function(e){
-                        alert("회원가입 실패!");
+                let params = $(this).serialize();
+
+                $.post(url, params).done(function(data){
+                    if(data.code == 200){
+                        alert("환영합니다 " + name + "님. 로그인을 해주세요");
+                        location.href = "/user/sign-in-view";
+                    } else{
+                        alert(data.error_message);
                     }
                 });
             });

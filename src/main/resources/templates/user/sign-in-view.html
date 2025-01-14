@@ -4,7 +4,7 @@
         xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
         layout:decorate="~{layout/signLayout}">
 <th:block layout:fragment="content">
-    <section class="contents d-flex justify-content-end align-items-center" style="height:1080px;">
+    <section class="contents d-flex justify-content-end align-items-center">
         <div class="signInBox bg-white d-flex justify-content-center align-items-center">
             <div class="w-50">
                 <div class="display-4 mb-3 d-flex justify-content-center">Instantgram</div>
@@ -25,10 +25,30 @@
 
     <script>
         $(function(){
-            $("#loginBtn").on("click", function(){
+            $("#signInForm").on("submit", function(e){
+                e.preventDefault();
+
                 let loginId = $("input[name=id]").val().trim();
                 let password = $("input[name=password]").val().trim();
-                event.preventDefault();
+
+                if(!loginId){
+                    alert("아이디를 입력하세요.");
+                }
+                if(!password){
+                    alert("비밀번호를 입력하세요.");
+                }
+
+                let url = $(this).attr("action");
+                let params = $(this).serialize();
+
+                $.post(url, params)
+                .done(function(data){
+                    if(data.code == 200){
+                        location.href = "/timeline"
+                    } else{
+                        alert(data.error_message);
+                    }
+                });
             });
         });
     </script>

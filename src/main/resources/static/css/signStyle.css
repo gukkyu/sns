@@ -17,3 +17,6 @@ width: 150px;
 .signUpBlank{
 height: 80px;
 }
+html, body, .section{
+min-height: 100%;
+}
