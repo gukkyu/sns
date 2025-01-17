@@ -6,8 +6,8 @@
     <section class="bg-info profile">
         <div class="font-weight-bold mt-5">My profile</div>
         <div>
-            <div th:text="|${session.userName}|"></div>
-            <div th:text="|${session.userLoginId}|"></div>
+            <div id="userName" th:text="|${session.userName}|"></div>
+            <div id="userLoginId" th:text="|${session.userLoginId}|"></div>
         </div>
     </section>
 </th:block>

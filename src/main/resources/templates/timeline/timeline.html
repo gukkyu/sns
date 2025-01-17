@@ -16,9 +16,9 @@
                         <input type="file" id="file" accept=".jpg, .png, .gif" class="d-none">
 
                         <!-- 이미지에 마우스 올리면 마우스 커서가 link로 변경 -->
-                        <a href="#" id="fileUploadBtn" class="m-2"><img width="30" src="https://static-00.iconduck.com/assets.00/camera-circle-icon-2048x2048-aggqa7eg.png"></a>
+                        <a href="#" id="fileUploadBtn" class="m-2"><img width="30px" src="https://static-00.iconduck.com/assets.00/camera-circle-icon-2048x2048-aggqa7eg.png"></a>
 
-                        <div id="fileName" class="ml-2"></div>
+                        <div id="fileName" class="ml-2 d-flex align-items-center"></div>
                     </div>
                     <button id="writeBtn" class="btn btn-info col-1">게시</button>
                 </div>
@@ -28,10 +28,19 @@
             <div class="timeline-box my-5">
 
                 <!-- 글(카드) 반복 -->
-                <div class="card border rounded m-3">
+                <div class="card border rounded m-3" th:each="card : ${cardList}">
                     <!-- 글쓴이, 더보기(삭제) -->
                     <div class="p-2 d-flex justify-content-between">
-                        <span class="font-weight-bold">글쓴이</span>
+                        <div class="d-flex">
+                            <img class="m-2" src="https://www.svgrepo.com/show/369630/user-circle.svg" width="50px">
+                            <div class="d-flex align-items-center">
+                                <div class="ml-2">
+                                    <div class="font-weight-bold" th:text="${card.user != null ? card.user.name : 'Unknown User'}">글쓴이</div>
+                                    <div class="small text-muted" th:text="${card.user != null ? card.user.loginId : 'No Login ID'}">글쓴이</div>
+                                </div>
+                                <button th:if="${card.user.id} == ${session.userId}" class="font-weight-bold text-primary btn btn-white ml-4">follow</button>
+                            </div>
+                        </div>
 
                         <!-- 더보기 ...(로그인 된 사람과 글쓴이 정보 일치할 때 보이게) -->
                         <a href="#" class="more-btn">
@@ -41,7 +50,12 @@
 
                     <!-- 본문 이미지 -->
                     <div class="card-img">
-                        <img src="https://cdn.pixabay.com/photo/2020/06/20/11/09/cat-5320572_1280.jpg" class="w-100" alt="본문 이미지">
+                        <img th:src="${card.post.imagePath}" class="w-100" alt="본문 이미지">
+                    </div>
+
+                    <!-- 글 -->
+                    <div class="card-post m-3">
+                        <span th:text="${card.post.content}">글 내용입니다!!!!</span>
                     </div>
 
                     <!-- 좋아요 -->
@@ -49,41 +63,144 @@
                         <a href="#" class="like-btn d-flex align-items-end mr-2">
                             <img src="https://static.thenounproject.com/png/4590951-200.png" width="20" height="20" alt="empty heart">
                         </a>
-                        <span>좋아요 13개</span>
-                    </div>
+                        <span class="mr-4 font-weight-bold">13</span>
 
-                    <!-- 글 -->
-                    <div class="card-post m-3">
-                        <span class="font-weight-bold">글쓴이</span>
-                        <span>글 내용입니다!!!!</span>
-                    </div>
-
-                    <!-- 댓글 제목 -->
-                    <div class="card-comment-title border-bottom">
-                        <div class="font-weight-bold ml-3 mb-1">댓글</div>
+                        <a href="#" class="commentBtn d-flex align-items-end mr-2">
+                            <img src="https://static-00.iconduck.com/assets.00/comment-icon-1024x964-julk98bl.png" width="20" height="20" alt="empty heart">
+                        </a>
+                        <span class="font-weight-bold">10</span>
                     </div>
 
                     <!-- 댓글 목록 -->
-                    <div class="card-comment-list m-2">
+                    <div class="card-comment-list my-2 border-top">
                         <!-- 댓글들 -->
-                        <div class="card-comment m-1">
-                            <span class="font-weight-bold">댓글쓰니</span>
-                            <span>댓글 내용임</span>
+                        <div class="card-comment my-3 ml-3 d-flex align-items-center">
+                            <span class="font-weight-bold d-flex align-items-center">댓글쓰니</span>
+                            <span class="ml-3 d-flex align-items-center">댓글 내용임</span>
 
                             <!-- 댓글 삭제(자신의 댓글만 가능) -->
-                            <a href="#" class="comment-del-btn">
+                            <a href="#" class="comment-del-btn ml-3 d-flex align-items-center">
                                 <img src="https://www.iconninja.com/files/603/22/506/x-icon.png" width="10" height="10">
                             </a>
                         </div>
 
                         <!-- 댓글 쓰기 -->
-                        <div class="comment-write d-flex border-top mt-2">
-                            <input type="text" class="comment-input form-control col-11 border-0" placeholder="댓글 달기">
-                            <button type="button" class="comment-btn btn col-1 btn-light">게시</button>
+                        <div class="comment-write d-flex px-2 mt-2">
+                            <input type="text" class="comment-input form-control border rounded" placeholder="댓글 달기">
+                            <button type="button" th:value="${session.userId}" class="comment-btn btn btn-light">게시</button>
                         </div>
                     </div> <!-- 댓글 끝 -->
                 </div> <!-- 카드 끝 -->
             </div> <!-- 타임라인 박스 끝 -->
         </div> <!-- 컨텐츠 박스 끝 -->
     </section>
+
+    <script>
+        $(function(){
+            $(".comment-btn").on("click", function(){
+                let postId = $(this).val();
+                // let comment = $(this).siblings(".comment-input").val().trim();
+                let comment = $(this).prev().val().trim();
+
+                console.log(postId);
+                console.log(comment);
+
+                if(!comment){
+                    alert("댓글 내용을 입력해주세요.");
+                    return;
+                }
+
+                $.ajax({
+                    type: "post",
+                    url: "/comment/create",
+                    data: {"postId": postId, "comment": comment},  // 쉼표 추가
+                    success: function(data){
+                        if(data.code == 403){
+                            alert("로그인 세션이 만료되었습니다. 다시 로그인 해주세요.");
+                            location.href = "/user/sign-in-view";
+                        } else if(data.code == 200){
+                            alert("댓글이 저장되었습니다.");
+                        } else {
+                            alert(data.error_message);
+                        }
+                    },
+                    error: function(e){
+                        alert("실패!");
+                    }
+                });
+            });
+
+            $("#fileUploadBtn").on("click", function(e){
+                e.preventDefault();
+
+                $("#file").click();
+
+            });
+
+            $("#file").on("change", function(e){
+
+                if(e.target.files[0] == null){
+                    $("#file").val("");
+                    $("#fileName").text("");
+                    return;
+                }
+
+                let fileName = e.target.files[0].name;
+                console.log(fileName);
+
+                let ext = fileName.split(".").pop().toLowerCase();
+                console.log(ext);
+
+                if(ext != "jpg" && ext != "gif" && ext != "png"){
+                    alert("이미지 파일만 업로드 할 수 있습니다.");
+                    $("#file").val("");
+                    $("#fileName").text("");
+                    return;
+                }
+
+                $("#fileName").text(fileName);
+            });
+
+            $("#writeBtn").on("click", function(){
+                let file = $("#file")[0].files[0];
+                let content = $("#writeTextArea").val();
+                let fileName = $("#fileName").text();
+
+
+                if(!fileName){
+                    alert("이미지를 첨부해주세요.");
+                    return;
+                }
+
+                let formData = new FormData();
+                formData.append("file", file);
+                formData.append("content", content);
+
+                $.ajax({
+                    type:"post",
+                    url:"/post/create",
+                    data:formData,
+                    processData:false,
+                    contentType:false,
+                    enctype:"multipart/form-data",
+
+                    success:function(data){
+                        if(data.code == 200){
+                            alert("포스트가 저장했습니다.");
+                            location.href = "/timeline";
+                        } else if(data.code == 403){
+                            alert("로그인 세션이 만료되었습니다. 다시 로그인해 주세요.");
+                            location.href = "/user/sign-in-view";
+                        } else{
+                            alert("게시 실패. 관리자에게 연락주세요.")
+                        }
+                    },
+                    error:function(e){
+                        alert("실패!");
+                    }
+                });
+            });
+
+        });
+    </script>
 </th:block>

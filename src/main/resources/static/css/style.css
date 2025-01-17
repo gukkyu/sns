@@ -1,11 +1,40 @@
-html, body, #wrap{
-min-height: 100%;
-}
-.black{
-color: black;
+#wrap {
+    display: flex;
+    min-height: 100vh; /* 화면 전체 높이를 차지 */
 }
 
-.menu{position:fixed}
-header{width:6%;}
-.profile{width:15%;}
-.timeline{width:79%;}
+/* header는 왼쪽에 고정 */
+header {
+    position: fixed; /* 화면 상단에 고정 */
+    top: 0;
+    left: 0;
+    height: 100vh; /* 화면 전체 높이를 차지 */
+    width: 6%; /* header 너비를 6%로 설정 */
+    z-index: 1000; /* 다른 콘텐츠들 위에 위치 */
+    background-color: white; /* 배경색을 흰색으로 설정 */
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* 오른쪽에 약간의 그림자 추가 */
+}
+
+/* 타임라인 영역 */
+.timeline {
+    flex: 1; /* 남은 공간을 차지 */
+    margin-left: 6%; /* header의 너비만큼 여백을 추가 */
+    width: 79%; /* 타임라인 영역 너비를 79%로 설정 */
+    padding-top: 20px; /* 헤더 밑에 여백을 주어 텍스트가 겹치지 않도록 */
+}
+
+/* 프로필 영역 */
+.profile {
+    width: 15%; /* 프로필 너비를 15%로 설정 */
+    padding-top: 20px; /* 위 여백 추가 */
+}
+
+.menu img {
+    width: 30%; /* 부모 요소인 .menu에 맞춰 이미지를 100% 크기로 설정 */
+    height: auto; /* 비율을 유지하면서 높이 자동으로 조정 */
+}
+
+#writeBtn, .comment-btn {
+    /* 버튼 스타일을 적절하게 조정 */
+    min-width: 60px; /* 최소 너비 설정 */
+}

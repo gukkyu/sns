@@ -68,6 +68,7 @@ public class UserRestController {
             result.put("code", 200);
             result.put("result", "성공");
             session.setAttribute("userLoginId", user.getLoginId());
+            session.setAttribute("userId", user.getId());
             session.setAttribute("userName", user.getName());
         } else{
             result.put("error_message", "아이디와 비밀번호를 확인해주세요.");
