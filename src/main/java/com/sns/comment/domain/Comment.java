@@ -1,10 +1,12 @@
 package com.sns.comment.domain;
 
 
+import lombok.ToString;
 import org.springframework.cglib.core.Local;
 
 import java.time.LocalDateTime;
 
+@ToString
 public class Comment {
     private int id;
     private int postId;

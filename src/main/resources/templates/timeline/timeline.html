@@ -38,7 +38,11 @@
                                     <div class="font-weight-bold" th:text="${card.user != null ? card.user.name : 'Unknown User'}">글쓴이</div>
                                     <div class="small text-muted" th:text="${card.user != null ? card.user.loginId : 'No Login ID'}">글쓴이</div>
                                 </div>
-                                <button th:if="${card.user.id} == ${session.userId}" class="font-weight-bold text-primary btn btn-white ml-4">follow</button>
+
+                                <th:block th:if="${card.user.id} != ${session.userId}">
+                                    <button th:data-post-user-id="${card.user.id}" th:if="${card.isFollow} == true" class="follow-btn font-weight-bold text-white btn btn-primary ml-4">followed</button>
+                                    <button th:data-post-user-id="${card.user.id}" th:unless="${card.isFollow} == true" class="follow-btn font-weight-bold text-primary btn btn-white ml-4">follow</button>
+                                </th:block>
                             </div>
                         </div>
 
@@ -60,34 +64,37 @@
 
                     <!-- 좋아요 -->
                     <div class="card-like m-3 d-flex align-items-center">
-                        <a href="#" class="like-btn d-flex align-items-end mr-2">
-                            <img src="https://static.thenounproject.com/png/4590951-200.png" width="20" height="20" alt="empty heart">
+                        <a href="#" th:data-like="${card.post.id}" class="like-btn d-flex align-items-end mr-2">
+                            <img th:if="${card.filledLike == false}" src="https://www.iconninja.com/files/214/518/441/heart-icon.png" width="20" height="20" alt="empty heart">
+                            <img th:unless="${card.filledLike == false}" src="https://www.iconninja.com/files/527/809/128/heart-icon.png" width="20" height="20" alt="filled heart">
                         </a>
-                        <span class="mr-4 font-weight-bold">13</span>
+                        <span class="mr-4 font-weight-bold" th:text="${card.likeCount}">13</span>
 
                         <a href="#" class="commentBtn d-flex align-items-end mr-2">
                             <img src="https://static-00.iconduck.com/assets.00/comment-icon-1024x964-julk98bl.png" width="20" height="20" alt="empty heart">
                         </a>
-                        <span class="font-weight-bold">10</span>
+                        <span class="font-weight-bold" th:text="${card.commentCount}">10</span>
                     </div>
 
                     <!-- 댓글 목록 -->
                     <div class="card-comment-list my-2 border-top">
                         <!-- 댓글들 -->
-                        <div class="card-comment my-3 ml-3 d-flex align-items-center">
-                            <span class="font-weight-bold d-flex align-items-center">댓글쓰니</span>
-                            <span class="ml-3 d-flex align-items-center">댓글 내용임</span>
+                        <div th:each="comment : ${card.commentList}">
+                            <div class="card-comment my-3 ml-3 d-flex align-items-center">
+                                <span class="font-weight-bold d-flex align-items-center" th:text="${comment.user.name}">댓글쓰니</span>
+                                <span class="ml-3 d-flex align-items-center" th:text="${comment.comment.comment}">댓글 내용임</span>
 
-                            <!-- 댓글 삭제(자신의 댓글만 가능) -->
-                            <a href="#" class="comment-del-btn ml-3 d-flex align-items-center">
-                                <img src="https://www.iconninja.com/files/603/22/506/x-icon.png" width="10" height="10">
-                            </a>
+                                <!-- 댓글 삭제(자신의 댓글만 가능) -->
+                                <a href="#" th:data-comment-comment-id="${comment.comment.id}" th:if="${comment.user.id} == ${session.userId}" class="comment-del-btn ml-3 d-flex align-items-center">
+                                    <img src="https://www.iconninja.com/files/603/22/506/x-icon.png" width="10" height="10">
+                                </a>
+                            </div>
                         </div>
 
                         <!-- 댓글 쓰기 -->
                         <div class="comment-write d-flex px-2 mt-2">
                             <input type="text" class="comment-input form-control border rounded" placeholder="댓글 달기">
-                            <button type="button" th:value="${session.userId}" class="comment-btn btn btn-light">게시</button>
+                            <button type="button" th:value="${card.post.id}" class="comment-btn btn btn-light">게시</button>
                         </div>
                     </div> <!-- 댓글 끝 -->
                 </div> <!-- 카드 끝 -->
@@ -97,6 +104,71 @@
 
     <script>
         $(function(){
+            $(".follow-btn").on("click", function(){
+                event.preventDefault();
+                let postUserId = $(this).data("post-user-id");
+
+                $.ajax({
+                    url:"/follow",
+                    data:{"postUserId": postUserId},
+
+                    success:function(data){
+                        if(data.code == 200){
+                            location.reload();
+                        } else{
+                            alert(data.error_message);
+                            location.href = "/user/sign-in-view";
+                        }
+                    },
+                    error:function(e){
+                        alert("실패!");
+                    }
+                });
+            });
+            $(".like-btn").on("click", function(){
+                event.preventDefault();
+                let like = $(this).data("like");
+
+                $.ajax({
+                    url:"/like/" + like,
+
+                    success:function(data){
+                        if(data.code == 200){
+                            location.reload();
+                        } else{
+                            alert(data.error_message);
+                            location.href = "/user/sign-in-view";
+                        }
+                    },
+                    error:function(e){
+                        alert("실패!");
+                    }
+                });
+            });
+
+            $(".comment-del-btn").on("click", function(){
+                event.preventDefault();
+                let id = $(this).data("comment-comment-id");
+                console.log(id);
+                $.ajax({
+                    type:"post",
+                    url:"/comment/delete",
+                    data:{"id" : id},
+
+                    success:function(data){
+                        if(data.code == 200){
+                            alert("댓글이 삭제되었습니다.");
+                            location.reload();
+                        } else{
+                            alert(data.error_message);
+                        }
+                    },
+                    error:function(e){
+                        alert("실패!");
+                    }
+                });
+            });
+
             $(".comment-btn").on("click", function(){
                 let postId = $(this).val();
                 // let comment = $(this).siblings(".comment-input").val().trim();
@@ -120,6 +192,7 @@
                             location.href = "/user/sign-in-view";
                         } else if(data.code == 200){
                             alert("댓글이 저장되었습니다.");
+                            location.reload();
                         } else {
                             alert(data.error_message);
                         }

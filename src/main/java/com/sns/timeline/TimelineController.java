@@ -2,6 +2,7 @@ package com.sns.timeline;
 
 import com.sns.comment.bo.CommentBO;
 import com.sns.comment.domain.Comment;
+import com.sns.comment.domain.CommentDTO;
 import com.sns.post.bo.PostBO;
 import com.sns.post.entity.PostEntity;
 import com.sns.timeline.bo.TimelineBO;
@@ -29,11 +30,13 @@ public class TimelineController {
 
     @GetMapping("/timeline")
     public String timeline(Model model, HttpSession session){
-        if(session.getAttribute("userId") == null){
+        Integer userId = (Integer)session.getAttribute("userId");
+        if(userId == null){
             return "/user/sign-in-view";
         }
-        List<CardDTO> cardList = timelineBO.generateCardList();
+        List<CardDTO> cardList = timelineBO.generateCardList(userId);
         model.addAttribute("cardList", cardList);
+
 
 //        List<PostEntity> postList = postBO.getPost();
 //        List<Comment> commentList = commentBO.getCommentList();
