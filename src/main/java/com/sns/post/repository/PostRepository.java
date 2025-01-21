@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface PostRepository extends JpaRepository <PostEntity, Integer> {
     public List<PostEntity> findAllByOrderByUpdatedAtDesc();
+    public List<PostEntity> findByUserId(int userId);
+    public int countByUserId(int userId);
 }

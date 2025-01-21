@@ -10,6 +10,14 @@ public class FollowerBO {
     @Autowired
     private FollowerMapper followerMapper;
 
+    public int getFollowCount(int userId){
+        return followerMapper.followCount(userId);
+    }
+
+    public int getFollowerCount(int userId){
+        return followerMapper.followerCount(userId);
+    }
+
     public boolean isFollow(int postId, int userId){
         boolean isFollow = followerMapper.isFollow(postId, userId);
         return isFollow;

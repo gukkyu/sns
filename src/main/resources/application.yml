@@ -1,4 +1,9 @@
 spring:
+  devtools:
+    livereload:
+      enabled: true
+    restart:
+      enabled: true
   servlet:
     multipart:
       max-file-size: 10MB   # 단일 요청 파일 최대 크기

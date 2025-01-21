@@ -8,7 +8,15 @@
         FROM
             `follower`
         WHERE
-            `followerId` = #{postId}
+            `userId` = #{userId}
+    </select>
+    <select id="followerCount" resultType="int">
+        SELECT
+            COUNT(*)
+        FROM
+            `follower`
+        WHERE
+            `followerId` = #{userId}
     </select>
     <select id="isFollow" parameterType="map" resultType="boolean">
         SELECT

@@ -2,7 +2,6 @@ package com.sns.post.bo;
 
 import com.sns.common.FileManagerService;
 import com.sns.post.entity.PostEntity;
-import com.sns.post.mapper.PostMapper;
 import com.sns.post.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,6 +16,14 @@ public class PostBO {
 
     @Autowired
     private FileManagerService fileManager;
+
+    public int getPostCountByUserId(int userId){
+        return postRepository.countByUserId(userId);
+    }
+
+    public List<PostEntity> getPostByUserId(int userId){
+        return postRepository.findByUserId(userId);
+    }
 
     public List<PostEntity> getPost(){
         return postRepository.findAllByOrderByUpdatedAtDesc();
