@@ -3,10 +3,9 @@
         lang="ko"
         xmlns:th="http://www.thymeleaf.org">
 <th:block th:fragment="sectionFragment">
-    <section class="profileList">
-
+    <section class="profileList border">
         <div class="w-75 d-flex align-items-center justify-content-center">
-            <div>
+            <a class="profile-info" th:href="|/profile?userId=${session.userId}|">
                 <!-- My profile 텍스트 -->
                 <div class="font-weight-bold mt-5 mb-4 d-flex align-items-center">
                     My profile
@@ -20,7 +19,7 @@
                         <div class="small text-muted" th:text="|${session.userLoginId}|">글쓴이</div>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
     </section>
 </th:block>

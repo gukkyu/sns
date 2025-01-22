@@ -2,6 +2,34 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout/profileLayout}">
 <th:block layout:fragment="content">
     <style>
+        /* 프로필 이미지와 텍스트 정렬 */
+        .profile-container {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            position: relative;
+        }
+
+        /* 프로필 이미지 스타일 */
+        .profile-image {
+            position: relative;
+            max-width: 200px;
+        }
+
+        /* select 태그 위치 조정 (이미지 중앙에 배치) */
+        .profile-select {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1rem;
+            padding: 5px 10px;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            z-index: 2;
+        }
+
         /* 프로필 이름 및 정보 스타일 */
         .profileName {
             font-size: 2rem;
@@ -13,14 +41,7 @@
             color: gray;
         }
 
-        /* 프로필 이미지와 텍스트 정렬 */
-        .profile-container {
-            display: flex;
-            align-items: center;
-            gap: 30px;
-        }
-
-        /* 프로필 이름 및 ID 정렬 */
+        /* 이름 및 ID 정렬 */
         .profile-info {
             display: flex;
             flex-direction: column;
@@ -77,9 +98,13 @@
         <div class="w-75"> <!-- 반응형 너비 조정 -->
             <div class="profile-container mt-5">
                 <!-- 프로필 이미지 -->
-                <img src="https://www.svgrepo.com/show/369630/user-circle.svg"
-                     class="img-fluid mb-5"
-                     style="max-width: 200px;">
+                <div class="profile-image">
+                    <img src="https://www.svgrepo.com/show/369630/user-circle.svg"
+                         class="img-fluid mb-5"
+                         style="width: 100%; height: auto;">
+                    <!-- Select 태그 추가 -->
+                    <input class="profile-select" type="file" id="file" accept=".jpg, .png, .gif">
+                </div>
 
                 <!-- 이름, 통계, 버튼 -->
                 <div class="d-flex flex-column w-100">
@@ -107,23 +132,24 @@
                             </div>
                         </div>
                     </div>
-
                     <!-- 버튼 그룹 -->
-                    <div th:if="${profile.user.id != session.userId}">
-                        <button class="follow-btn btn btn-white text-primary font-weight-bold" th:if="${!profile.isFollow}">
-                            follow
-                        </button>
-                        <button class="follow-btn btn btn-primary font-weight-bold" th:if="${profile.isFollow}">
-                            followed
-                        </button>
-                        <button class="message-btn btn btn-success font-weight-bold">
-                            message
-                        </button>
-                    </div>
-                    <div th:unless="${profile.user.id != session.userId}" class="button-group d-flex justify-content-end">
-                        <button class="follow-btn btn btn-primary font-weight-bold">
-                            Edit profile
-                        </button>
+                    <div class="button-group d-flex justify-content-end">
+                        <div th:if="${profile.user.id != session.userId}" class="d-flex gap-2">
+                            <button class="follow-btn btn btn-white text-primary font-weight-bold mr-3" th:if="${!profile.isFollow}">
+                                follow
+                            </button>
+                            <button class="follow-btn btn btn-primary font-weight-bold mr-3" th:if="${profile.isFollow}">
+                                followed
+                            </button>
+                            <button class="message-btn btn btn-success font-weight-bold">
+                                message
+                            </button>
+                        </div>
+                        <div th:unless="${profile.user.id != session.userId}" class="d-flex gap-2">
+                            <button class="follow-btn btn btn-primary font-weight-bold">
+                                Edit profile
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -138,5 +164,8 @@
             </div>
         </div>
     </section>
+    <script>
+
+    </script>
 </th:block>
 </html>

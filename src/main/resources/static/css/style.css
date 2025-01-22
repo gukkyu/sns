@@ -3,7 +3,11 @@
     min-height: 100vh; /* 화면 전체 높이를 차지 */
 }
 
-/* header는 왼쪽에 고정 */
+a, a:hover {
+    text-decoration: none; /* 링크의 밑줄 제거 */
+    color: inherit;
+}
+    /* header는 왼쪽에 고정 */
 header {
     position: fixed; /* 화면 상단에 고정 */
     top: 0;
