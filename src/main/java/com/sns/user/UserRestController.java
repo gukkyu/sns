@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpSession;
 import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -73,6 +74,20 @@ public class UserRestController {
         } else{
             result.put("error_message", "아이디와 비밀번호를 확인해주세요.");
         }
+        return result;
+    }
+
+    @PutMapping("/update")
+    public Map<String, Object> updateUser(
+            @RequestParam("introduce") String introduce,
+            @RequestParam(value = "file", required = false) MultipartFile file,
+            HttpSession session
+            ){
+        int userId = (int)session.getAttribute("userId");
+        userBO.updateUserIntroduceAndImagePathById(userId, introduce, file);
+        Map<String, Object> result = new HashMap<>();
+        result.put("code", 200);
+        result.put("result", "성공");
         return result;
     }
 }

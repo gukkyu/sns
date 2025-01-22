@@ -10,24 +10,23 @@
             position: relative;
         }
 
-        /* 프로필 이미지 스타일 */
+        /* 프로필 이미지 컨테이너 */
         .profile-image {
-            position: relative;
-            max-width: 200px;
+            width: 200px; /* 원형 크기 */
+            aspect-ratio: 1 / 1; /* 정사각형 비율 강제 */
+            border-radius: 50%; /* 원형 */
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f0f0; /* 테스트용 배경색 */
         }
 
-        /* select 태그 위치 조정 (이미지 중앙에 배치) */
-        .profile-select {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 1rem;
-            padding: 5px 10px;
-            background-color: white;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            z-index: 2;
+        .profile-image img {
+            width: 100%; /* 이미지의 너비를 컨테이너에 맞춤 */
+            height: 100%; /* 높이도 컨테이너에 맞춤 */
+            object-fit: cover; /* 컨테이너를 꽉 채우면서 왜곡 방지 */
+            object-position: center; /* 중심을 기준으로 표시 */
         }
 
         /* 프로필 이름 및 정보 스타일 */
@@ -36,9 +35,8 @@
             font-weight: bold;
         }
 
-        .profileId {
+        .profileId, .profileIntroduce {
             font-size: 1.2rem;
-            color: gray;
         }
 
         /* 이름 및 ID 정렬 */
@@ -99,11 +97,12 @@
             <div class="profile-container mt-5">
                 <!-- 프로필 이미지 -->
                 <div class="profile-image">
-                    <img src="https://www.svgrepo.com/show/369630/user-circle.svg"
-                         class="img-fluid mb-5"
-                         style="width: 100%; height: auto;">
-                    <!-- Select 태그 추가 -->
-                    <input class="profile-select" type="file" id="file" accept=".jpg, .png, .gif">
+                    <img th:unless="${profile.user.profileImagePath == null}"
+                         th:src="${profile.user.profileImagePath}"
+                         alt="Profile Image">
+                    <img th:if="${profile.user.profileImagePath == null}"
+                         src="https://www.svgrepo.com/show/369630/user-circle.svg"
+                         alt="Default Profile Image">
                 </div>
 
                 <!-- 이름, 통계, 버튼 -->
@@ -114,6 +113,10 @@
                         <div class="profile-info ml-5">
                             <span class="profileName" th:text="|${profile.user.name}|">김선우</span>
                             <span class="profileId text-muted" th:text="|${profile.user.loginId}|">aaaa</span>
+                            <span th:if="${profile.user.introduce != null}" class="profileIntroduce mt-3" th:text="|${profile.user.introduce}|">aaaa</span>
+                            <span th:unless="${profile.user.introduce != null}" class="profileIntroduce mt-3">자기소개 없음</span>
+                            <input type="text" style="width:500px;" class="introduce form-control d-none mt-3" placeholder="자기소개를 입력하세요.">
+                            <input class="profile-select d-none mt-3" type="file" id="file" accept=".jpg, .png">
                         </div>
 
                         <!-- 포스트, 팔로워, 팔로잉 -->
@@ -146,8 +149,11 @@
                             </button>
                         </div>
                         <div th:unless="${profile.user.id != session.userId}" class="d-flex gap-2">
-                            <button class="follow-btn btn btn-primary font-weight-bold">
+                            <button id="editBtn" class="follow-btn btn btn-primary font-weight-bold">
                                 Edit profile
+                            </button>
+                            <button id="saveBtn" class="follow-btn btn btn-primary font-weight-bold d-none">
+                                Save
                             </button>
                         </div>
                     </div>
@@ -165,7 +171,60 @@
         </div>
     </section>
     <script>
+        $(function(){
+            $("#editBtn").on("click", function (){
+                $("#editBtn").addClass("d-none");
+                $(".profileIntroduce").addClass("d-none");
+                $("#saveBtn").removeClass("d-none");
+                $(".profile-select").removeClass("d-none");
+                $(".introduce").removeClass("d-none");
 
+                $("#profile-select").on("change", function(){
+                    let fileName = $("#file").val();
+                    if(fileName){ // && !(fileName.endsWith(".jpg") || fileName.endsWith(".png") || fileName.endsWith(".gif"))
+                        let extension = fileName.split(".").pop().toLowerCase(); // 마지막 배열 = .pop()
+                        if ($.inArray(extension, ["jpg", "png"]) == -1){
+                            alert("이미지 파일만 업로드 할 수 있습니다.");
+                            $("#file").val("");
+                            return;
+                        }
+                    } else if(!fileName){
+                        $("#file").val("");
+                    }
+                });
+
+                $("#saveBtn").on("click", function(){
+                    let introduce = $(".introduce").val().trim();
+                    let file = $(".profile-select")[0].files[0];
+
+                    let formData = new FormData();
+                    formData.append("introduce", introduce);
+                    formData.append("file", file);
+
+                    $.ajax({
+                        type: "PUT",
+                        url: "/user/update",
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        enctype: "multipart/form-data",
+
+                        success: function (data){
+                            if(data.code == 200){
+                                alert("내 정보가 수정되었습니다.");
+                                location.reload();
+                            } else{
+                                alert(data.error_message);
+                            }
+                        },
+                        error: function (e){
+                            alert("실패!");
+                        }
+
+                    });
+                });
+            });
+        });
     </script>
 </th:block>
 </html>
