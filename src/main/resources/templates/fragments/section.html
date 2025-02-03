@@ -3,6 +3,25 @@
         lang="ko"
         xmlns:th="http://www.thymeleaf.org">
 <th:block th:fragment="sectionFragment">
+    <style>
+        .profile-image {
+            width: 45px; /* 원형 크기 */
+            aspect-ratio: 1 / 1; /* 정사각형 비율 강제 */
+            border-radius: 50%; /* 원형 */
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f0f0; /* 테스트용 배경색 */
+        }
+
+        .profile-image img {
+            width: 100%; /* 이미지의 너비를 컨테이너에 맞춤 */
+            height: 100%; /* 높이도 컨테이너에 맞춤 */
+            object-fit: cover; /* 컨테이너를 꽉 채우면서 왜곡 방지 */
+            object-position: center; /* 중심을 기준으로 표시 */
+        }
+    </style>
     <section class="profileList border">
         <div class="d-flex align-items-center justify-content-center">
             <a class="profile-info" th:href="|/profile?userId=${session.userId}|">
@@ -12,8 +31,15 @@
                 </div>
 
                 <!-- 이미지와 글 내용 -->
-                <div class="d-flex align-items-center mt-3">
-                    <img src="https://www.svgrepo.com/show/369630/user-circle.svg" width="50px" class="mr-3">
+                <div class="d-flex align-items-center">
+                    <div class="profile-image mr-3">
+                        <img th:unless="${session.profileImagePath == null}"
+                             th:src="${session.profileImagePath}"
+                             alt="Profile Image">
+                        <img th:if="${session.profileImagePath == null}"
+                             src="https://www.svgrepo.com/show/369630/user-circle.svg"
+                             alt="Default Profile Image">
+                    </div>
                     <div>
                         <div class="font-weight-bold" th:text="|${session.userName}|">글쓴이</div>
                         <div class="small text-muted" th:text="|${session.userLoginId}|">글쓴이</div>

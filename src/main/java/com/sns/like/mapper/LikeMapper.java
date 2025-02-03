@@ -9,4 +9,5 @@ public interface LikeMapper {
     public int likeCount(int postId);
     public int insertLike(@Param("postId") int postId, @Param("userId") int userId);
     public int deleteLike(@Param("postId") int postId, @Param("userId") int userId);
+    public void deleteAllLike(int postId);
 }

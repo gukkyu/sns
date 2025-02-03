@@ -32,8 +32,13 @@
                     <!-- 글쓴이, 더보기(삭제) -->
                     <div class="p-2 d-flex justify-content-between">
                         <div class="d-flex">
-                            <a th:href="|/profile?userId=${card.user.id}|">
-                                <img class="m-2" src="https://www.svgrepo.com/show/369630/user-circle.svg" width="50px">
+                            <a class="profile-images m-2" th:href="|/profile?userId=${card.user.id}|">
+                                <img th:unless="${card.user.profileImagePath == null}"
+                                     th:src="${card.user.profileImagePath}"
+                                     alt="Profile Image">
+                                <img th:if="${card.user.profileImagePath == null}"
+                                     src="https://www.svgrepo.com/show/369630/user-circle.svg"
+                                     alt="Default Profile Image">
                             </a>
                             <div class="d-flex align-items-center">
                                 <a th:href="|/profile?userId=${card.user.id}|" class="profile-info ml-2">
@@ -49,7 +54,7 @@
                         </div>
 
                         <!-- 더보기 ...(로그인 된 사람과 글쓴이 정보 일치할 때 보이게) -->
-                        <a href="#" class="more-btn">
+                        <a href="#" class="more-btn" th:data-post-id="${card.post.id}" th:if="${card.user.id} == ${session.userId}" data-toggle="modal" data-target="#modal">
                             <img src="https://www.iconninja.com/files/860/824/939/more-icon.png" width="30">
                         </a>
                     </div>
@@ -104,8 +109,53 @@
         </div> <!-- 컨텐츠 박스 끝 -->
     </section>
 
+    <!-- Modal -->
+    <div class="modal fade" id="modal">
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+            <div class="modal-content text-center">
+                <div class="py-3">
+                    <a><button type="button" id="postDel" class="btn">삭제하기</button></a>
+                </div>
+                <div class="py-3 border-top">
+                    <a data-dismiss="modal"><button type="button" class="btn">취소</button></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <script>
         $(function(){
+            $(".more-btn").on("click", function (){
+                let postId = $(this).data("post-id");
+
+                $("#modal").data("post-id", postId); //set
+            });
+
+            $("#modal #postDel").on("click", function(){
+                event.preventDefault();
+
+                let postId = $("#modal").data("post-id");
+
+                $.ajax({
+                    type:"delete",
+                    url:"post/delete",
+                    data:{"postId":postId},
+
+                    success:function(data){
+                        if(data.code == 200){
+                            alert("포스트가 삭제되었습니다.");
+                            location.reload();
+                        } else if (data.code == 403){
+                            alert(error_message);
+                        }
+                    },
+                    error:function(e){
+                        alert("실패!");
+                    }
+                });
+            });
+
             $(".follow-btn").on("click", function(){
                 event.preventDefault();
                 let postUserId = $(this).data("post-user-id");

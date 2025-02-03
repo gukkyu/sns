@@ -3,6 +3,24 @@
     min-height: 100vh; /* 화면 전체 높이를 차지 */
 }
 
+.profile-images {
+    width: 45px; /* 원형 크기 */
+    aspect-ratio: 1 / 1; /* 정사각형 비율 강제 */
+    border-radius: 50%; /* 원형 */
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f0f0f0; /* 테스트용 배경색 */
+}
+
+.profile-images img {
+    width: 100%; /* 이미지의 너비를 컨테이너에 맞춤 */
+    height: 100%; /* 높이도 컨테이너에 맞춤 */
+    object-fit: cover; /* 컨테이너를 꽉 채우면서 왜곡 방지 */
+    object-position: center; /* 중심을 기준으로 표시 */
+}
+
 a, a:hover {
     text-decoration: none; /* 링크의 밑줄 제거 */
     color: inherit;
